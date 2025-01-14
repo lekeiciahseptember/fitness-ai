@@ -5,7 +5,6 @@ import os
 from typing import List, Tuple
 
 def check_command_exists(command: str) -> bool:
-    """Check if a command is available in the system."""
     try:
         subprocess.run([command, '--version'], capture_output=True)
         return True
@@ -19,12 +18,10 @@ def check_python_dependencies() -> Tuple[bool, List[str]]:
         return False, []
     
     try:
-        # Get list of installed packages
         result = subprocess.run([sys.executable, '-m', 'pip', 'freeze'], 
-                              capture_output=True, text=True)
+        capture_output=True, text=True)
         installed = set(result.stdout.split())
         
-        # Read required packages
         with open('requirements.txt', 'r') as f:
             required = set(f.read().split())
         
@@ -46,7 +43,7 @@ def install_python_dependencies() -> bool:
     """Install Python dependencies from requirements.txt."""
     try:
         subprocess.run([sys.executable, '-m', 'pip', 'install', '-r', 'requirements.txt'], 
-                      check=True)
+        check=True)
         return True
     except subprocess.CalledProcessError as e:
         print(f"Error installing Python dependencies: {e}")
@@ -64,7 +61,6 @@ def install_node_dependencies() -> bool:
         return False
 
 def main():
-    # Check if required tools are installed
     if not check_command_exists('node'):
         print("Error: Node.js is not installed")
         return
@@ -73,7 +69,7 @@ def main():
         print("Error: npm is not installed")
         return
     
-    # Check and install Python dependencies
+
     python_deps_installed, missing_deps = check_python_dependencies()
     if not python_deps_installed:
         print("Missing Python dependencies:", missing_deps)
@@ -83,7 +79,6 @@ def main():
         else:
             print("Failed to install Python dependencies")
     
-    # Check and install Node dependencies
     if not check_node_dependencies():
         print("Node.js dependencies not found")
         print("Installing Node.js dependencies...")
