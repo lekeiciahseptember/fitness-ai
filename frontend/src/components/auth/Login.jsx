@@ -1,8 +1,23 @@
 import React from "react";
-// import Login from "./Login.css"
+import { useNavigate } from 'react-router-dom';
 import loginImage from "../../assets/login.jpg"
 
 function Login() {
+
+    const navigate = useNavigate();
+
+    const handleRegister = () => {
+        navigate('/register');
+    }
+
+    const handleForgottenPassword = () => {
+        navigate('/forgotPassword');
+    }
+
+    const handleDashboard = () => {
+        navigate('/dashboard/Dashboard');
+    }
+
     return (
         <div style={{ 
             display: 'flex',
@@ -69,9 +84,43 @@ function Login() {
                         />
                     </div>
                     <div style={{ marginBottom: '20px' }}>
-                        <a href="#" style={{ textDecoration: 'none', color: '#666' }}>
+
+                        {/* <a href="#" style={{ textDecoration: 'none', color: '#666' }}>
                             Forgot Password?
                         </a>
+                        <a href="#" onClick={handleRegister} style={{ textDecoration: 'none', color: '#666', marginLeft: '20px'}}>
+                            Don't have an account? Sign Up.
+                        </a> */}
+
+                        <button 
+                            type="button"
+                            onClick={handleForgottenPassword}
+                            style={{
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                color: '#666',
+                                cursor: 'pointer',
+                                textDecoration: 'underline'
+                            }}>
+                            Forgot Password?
+                        </button>
+
+                        <button 
+                            type="button"
+                            onClick={handleRegister}
+                            style={{
+                                backgroundColor: 'transparent',
+                                border: 'none',
+                                color: '#666',
+                                cursor: 'pointer',
+                                textDecoration: 'underline'
+                            }}>
+                            Don't have an account? Sign Up.
+                        </button>
+
+
+
+
                     </div>
                     <button 
                         type="submit"
@@ -82,7 +131,8 @@ function Login() {
                             color: 'white',
                             border: 'none',
                             borderRadius: '4px',
-                            cursor: 'pointer'
+                            cursor: 'pointer',
+                            onSubmit: {handleDashboard}
                         }}
                     >
                         Log In

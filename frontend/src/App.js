@@ -1,16 +1,21 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, } from 'react-router-dom';
 import Login from "./components/auth/Login";
+import Register from "./components/auth/Register";
+import ForgotPassword from './components/auth/ForgotPassword';
+import Dashboard from './components/dashboard/Dashboard';
 
 function App() {
   return (
-    <Router>
-      <div className="App">
+    <BrowserRouter>
         <Routes>
           <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgotPassword" element={<ForgotPassword />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
-      </div>
-    </Router>
+    </BrowserRouter>
+    
   );
 }
 
