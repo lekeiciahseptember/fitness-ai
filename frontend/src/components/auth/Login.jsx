@@ -124,6 +124,7 @@ function Login() {
                     </div>
                     <button 
                         type="submit"
+                        onSubmit={handleDashboard}
                         style={{
                             width: '100%',
                             padding: '10px',
@@ -132,7 +133,6 @@ function Login() {
                             border: 'none',
                             borderRadius: '4px',
                             cursor: 'pointer',
-                            onSubmit: {handleDashboard}
                         }}
                     >
                         Log In

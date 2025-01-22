@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import registerImage from "../../assets/register.jpg"; 
 
 function Register() {
+    
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({

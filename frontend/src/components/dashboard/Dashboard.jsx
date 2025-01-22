@@ -1,9 +1,23 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
+    const navigate = useNavigate();
+
+    // const handleLogin = () => {
+    //     navigate('/login');
+    // }
+
+    // const handleRegister = () => {
+    //     navigate('/register');
+    // }
+
+    
+
+
     return (
         <div>
-            <h1>Dashboard - testing</h1>
+            
         </div>
     );
 }
