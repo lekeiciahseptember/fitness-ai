@@ -5,6 +5,7 @@ def main():
     db = DynamoDBService()
     print("Creating Users table...")
     db.create_user_table()
+    print("Testing table creation")
     print("Table created successfully!")
 
 if __name__ == "__main__":

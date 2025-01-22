@@ -1,10 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth  # Add this import
+from app.routes import auth  
 
 app = FastAPI()
 
-# Add CORS middleware before any routes
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"], 
@@ -13,7 +12,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include the auth router
 app.include_router(auth.router, prefix="/api/auth")
 
 @app.get("/")
