@@ -9,6 +9,7 @@ import ForgotPassword from './components/auth/ForgotPassword';
 import WorkoutPlans from './components/workouts/WorkoutPlans';
 import FitnessAssessment from './components/assessment/FitnessAssessment';
 import NutritionGuide from './components/nutrition/NutritionGuide';
+import Profile from './components/profile/Profile';
 
 // Create a theme instance
 const theme = createTheme({
@@ -154,6 +155,11 @@ function App() {
           <Route path="/nutrition" element={
             <MainLayout>
               <NutritionGuide />
+            </MainLayout>
+          } />
+          <Route path="/profile" element={
+            <MainLayout>
+              <Profile />
             </MainLayout>
           } />
         </Routes>
