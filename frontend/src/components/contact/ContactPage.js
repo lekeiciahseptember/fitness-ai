@@ -117,7 +117,7 @@ const ContactPage = () => {
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Email color="primary" sx={{ mr: 2 }} />
                         <Typography>
-                          fitwellwomen@gmail.com
+                          support@fitwellwomen.com
                         </Typography>
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -205,7 +205,7 @@ const ContactPage = () => {
                 }}
               >
                 <Typography variant="h4" gutterBottom color="primary">
-                  Become a Sponsor
+                  Reach out to us!
                 </Typography>
                 <Typography color="text.secondary" paragraph>
                   Fill out the form below to explore sponsorship opportunities with FitWell Women

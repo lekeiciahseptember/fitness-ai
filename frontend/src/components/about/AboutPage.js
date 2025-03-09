@@ -22,6 +22,8 @@ import {
   EmojiObjects,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
+import lekeiciahImage from '../../assets/images/lekeiciah.jpg';
+import rachelineImage from '../../assets/images/racheline.jpg';
 
 const AboutPage = () => {
   return (
@@ -68,22 +70,21 @@ const AboutPage = () => {
                 >
                   <CardContent sx={{ p: 4, textAlign: 'center' }}>
                     <Avatar
+                      src={lekeiciahImage}
                       sx={{
-                        width: 150,
-                        height: 150,
+                        width: 200,
+                        height: 200,
                         mx: 'auto',
                         mb: 3,
                         border: '4px solid',
                         borderColor: 'primary.main',
                       }}
-                    >
-                      LS
-                    </Avatar>
+                    />
                     <Typography variant="h4" gutterBottom color="primary">
                       Lekeiciah September
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                      Co-Founder & Wellness Director
+                      Co-Founder & Technology Lead
                     </Typography>
                     <Typography variant="body1" paragraph sx={{ mt: 2 }}>
                       At 21, Lekeiciah brings her expertise in Software Engineering, Cloud Computing, and AI
@@ -121,22 +122,21 @@ const AboutPage = () => {
                 >
                   <CardContent sx={{ p: 4, textAlign: 'center' }}>
                     <Avatar
+                      src={rachelineImage}
                       sx={{
-                        width: 150,
-                        height: 150,
+                        width: 200,
+                        height: 200,
                         mx: 'auto',
                         mb: 3,
                         border: '4px solid',
                         borderColor: 'secondary.main',
                       }}
-                    >
-                      RM
-                    </Avatar>
+                    />
                     <Typography variant="h4" gutterBottom color="secondary">
                       Racheline Mouyana
                     </Typography>
                     <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-                      Co-Founder & Health Technology Lead
+                      Co-Founder & Innovation Lead
                     </Typography>
                     <Typography variant="body1" paragraph sx={{ mt: 2 }}>
                       At 23, Racheline leads our technical innovation with her expertise in AI, Automation,

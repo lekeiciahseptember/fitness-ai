@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Card,
@@ -13,6 +14,12 @@ import {
   Grid,
   IconButton,
   Divider,
+  Stepper,
+  Step,
+  StepLabel,
+  Paper,
+  TextField,
+  CircularProgress,
 } from '@mui/material';
 import {
   FitnessCenter,
@@ -20,341 +27,342 @@ import {
   CheckCircle,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import MealPlanGuide from '../nutrition/MealPlanGuide';
+import { useHealth } from '../../context/HealthContext';
+import { generateWeeklyMealPlan, generateShoppingList } from '../nutrition/mealPlanData';
 
-const healthConditions = [
-  {
-    id: 'pregnancy',
-    label: 'Pregnancy',
-    recommendations: {
-      exercise: [
-        'Low-impact cardio like walking or swimming',
-        'Prenatal yoga',
-        'Pelvic floor exercises',
-        'Modified strength training with lighter weights'
-      ],
-      nutrition: [
-        'Increase folic acid intake',
-        'Consume more iron-rich foods',
-        'Stay hydrated',
-        'Eat small, frequent meals'
-      ]
-    }
-  },
-  {
-    id: 'pcos',
-    label: 'PCOS',
-    recommendations: {
-      exercise: [
-        'Regular moderate cardio',
-        'Strength training',
-        'HIIT workouts',
-        'Yoga for stress management'
-      ],
-      nutrition: [
-        'Low glycemic index foods',
-        'Anti-inflammatory foods',
-        'Limit processed sugars',
-        'Include lean proteins'
-      ]
-    }
-  },
-  {
-    id: 'thyroid',
-    label: 'Thyroid Conditions',
-    recommendations: {
-      exercise: [
-        'Low to moderate intensity cardio',
-        'Light strength training',
-        'Yoga and stretching',
-        'Walking'
-      ],
-      nutrition: [
-        'Iodine-rich foods',
-        'Selenium-rich foods',
-        'Avoid processed foods',
-        'Regular meal timing'
-      ]
-    }
-  },
-  {
-    id: 'arthritis',
-    label: 'Arthritis',
-    recommendations: {
-      exercise: [
-        'Water aerobics',
-        'Gentle yoga',
-        'Low-impact exercises',
-        'Range of motion exercises'
-      ],
-      nutrition: [
-        'Anti-inflammatory foods',
-        'Omega-3 rich foods',
-        'Calcium and vitamin D',
-        'Avoid processed foods'
-      ]
-    }
-  },
-  {
-    id: 'endometriosis',
-    label: 'Endometriosis',
-    recommendations: {
-      exercise: [
-        'Low-impact exercises',
-        'Pelvic floor exercises',
-        'Gentle stretching',
-        'Walking and swimming'
-      ],
-      nutrition: [
-        'Anti-inflammatory diet',
-        'Avoid caffeine and alcohol',
-        'Rich in omega-3 fatty acids',
-        'High-fiber foods'
-      ]
-    }
-  },
-  {
-    id: 'menopause',
-    label: 'Menopause',
-    recommendations: {
-      exercise: [
-        'Weight-bearing exercises',
-        'Resistance training',
-        'Balance exercises',
-        'Yoga for stress relief'
-      ],
-      nutrition: [
-        'Foods rich in calcium and vitamin D',
-        'Phytoestrogen-rich foods',
-        'Reduce caffeine and spicy foods',
-        'Increase protein intake'
-      ]
-    }
-  },
-  {
-    id: 'osteoporosis',
-    label: 'Osteoporosis',
-    recommendations: {
-      exercise: [
-        'Weight-bearing exercises',
-        'Balance training',
-        'Low-impact activities',
-        'Resistance exercises with guidance'
-      ],
-      nutrition: [
-        'High calcium foods',
-        'Vitamin D rich foods',
-        'Protein-rich diet',
-        'Limit sodium intake'
-      ]
-    }
-  },
-  {
-    id: 'diabetes',
-    label: 'Diabetes',
-    recommendations: {
-      exercise: [
-        'Regular aerobic exercise',
-        'Strength training',
-        'Flexibility exercises',
-        'Monitor blood sugar during workouts'
-      ],
-      nutrition: [
-        'Low glycemic index foods',
-        'Control carbohydrate portions',
-        'Regular meal timing',
-        'High-fiber foods'
-      ]
-    }
-  }
+const commonAllergies = [
+  { id: 'dairy', label: 'Dairy', icon: '🥛' },
+  { id: 'nuts', label: 'Tree Nuts', icon: '🥜' },
+  { id: 'peanuts', label: 'Peanuts', icon: '🥜' },
+  { id: 'eggs', label: 'Eggs', icon: '🥚' },
+  { id: 'soy', label: 'Soy', icon: '🫘' },
+  { id: 'wheat', label: 'Wheat/Gluten', icon: '🌾' },
+  { id: 'fish', label: 'Fish', icon: '🐟' },
+  { id: 'shellfish', label: 'Shellfish', icon: '🦐' },
 ];
 
+const healthConditions = [
+  { id: 'pregnancy', label: 'Pregnancy' },
+  { id: 'pcos', label: 'PCOS' },
+  { id: 'thyroid', label: 'Thyroid Conditions' },
+  { id: 'arthritis', label: 'Arthritis' },
+  { id: 'endometriosis', label: 'Endometriosis' },
+  { id: 'menopause', label: 'Menopause' },
+  { id: 'osteoporosis', label: 'Osteoporosis' },
+  { id: 'diabetes', label: 'Diabetes' },
+];
+
+const fitnessGoals = [
+  { id: 'weight_loss', label: 'Weight Loss' },
+  { id: 'muscle_gain', label: 'Muscle Gain' },
+  { id: 'maintenance', label: 'Maintenance' },
+  { id: 'energy', label: 'Increased Energy' },
+  { id: 'endurance', label: 'Improved Endurance' },
+];
+
+const steps = ['Health Conditions', 'Allergies & Restrictions', 'Fitness Goals', 'Review'];
+
 const HealthAssessment = () => {
-  const [selectedConditions, setSelectedConditions] = useState([]);
-  const [showRecommendations, setShowRecommendations] = useState(false);
+  const navigate = useNavigate();
+  const { healthData, updateHealthData } = useHealth();
+  const [activeStep, setActiveStep] = useState(0);
+  const [formData, setFormData] = useState({
+    healthConditions: [],
+    allergies: [],
+    fitnessGoals: [],
+    additionalNotes: '',
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
-  const handleConditionChange = (conditionId) => {
-    setSelectedConditions(prev => {
-      if (prev.includes(conditionId)) {
-        return prev.filter(id => id !== conditionId);
+  const handleNext = () => {
+    if (activeStep === steps.length - 1) {
+      setIsLoading(true);
+      try {
+        const mealPlan = generateWeeklyMealPlan({
+          allergies: formData.allergies,
+          healthConditions: formData.healthConditions,
+          fitnessGoals: formData.fitnessGoals
+        });
+        
+        const shoppingList = generateShoppingList(mealPlan);
+        
+        updateHealthData({
+          allergies: formData.allergies,
+          healthConditions: formData.healthConditions,
+          fitnessGoals: formData.fitnessGoals,
+          additionalNotes: formData.additionalNotes,
+          currentMealPlan: mealPlan,
+          shoppingList: shoppingList,
+        });
+
+        setSuccess(true);
+        // Navigate after a short delay to show success message
+        setTimeout(() => {
+          navigate('/nutrition');
+        }, 1500);
+      } catch (error) {
+        setError('Failed to generate meal plan. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
-      return [...prev, conditionId];
-    });
-    setShowRecommendations(false);
+    } else {
+      setActiveStep((prev) => prev + 1);
+    }
   };
 
-  const getRecommendations = () => {
-    const recommendations = {
-      exercise: new Set(),
-      nutrition: new Set()
-    };
-
-    selectedConditions.forEach(conditionId => {
-      const condition = healthConditions.find(c => c.id === conditionId);
-      if (condition) {
-        condition.recommendations.exercise.forEach(rec => recommendations.exercise.add(rec));
-        condition.recommendations.nutrition.forEach(rec => recommendations.nutrition.add(rec));
-      }
-    });
-
-    return {
-      exercise: Array.from(recommendations.exercise),
-      nutrition: Array.from(recommendations.nutrition)
-    };
+  const handleBack = () => {
+    setActiveStep((prev) => prev - 1);
   };
+
+  const handleChange = (section) => (event) => {
+    const { name, checked, value } = event.target;
+    setFormData(prev => ({
+      ...prev,
+      [section]: section === 'additionalNotes' 
+        ? value 
+        : checked 
+          ? [...prev[section], name]
+          : prev[section].filter(item => item !== name),
+    }));
+  };
+
+  const renderStepContent = (step) => {
+    switch (step) {
+      case 0:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Select any health conditions that apply:
+            </Typography>
+            <Grid container spacing={2}>
+              {healthConditions.map((condition) => (
+                <Grid item xs={12} sm={6} key={condition.id}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.healthConditions.includes(condition.id)}
+                        onChange={handleChange('healthConditions')}
+                        name={condition.id}
+                      />
+                    }
+                    label={condition.label}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        );
+
+      case 1:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Select any allergies or dietary restrictions:
+            </Typography>
+            <Grid container spacing={2}>
+              {commonAllergies.map((allergy) => (
+                <Grid item xs={12} sm={6} md={3} key={allergy.id}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.allergies.includes(allergy.id)}
+                        onChange={handleChange('allergies')}
+                        name={allergy.id}
+                      />
+                    }
+                    label={`${allergy.icon} ${allergy.label}`}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        );
+
+      case 2:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Select your fitness goals:
+            </Typography>
+            <Grid container spacing={2}>
+              {fitnessGoals.map((goal) => (
+                <Grid item xs={12} sm={6} key={goal.id}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={formData.fitnessGoals.includes(goal.id)}
+                        onChange={handleChange('fitnessGoals')}
+                        name={goal.id}
+                      />
+                    }
+                    label={goal.label}
+                  />
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
+        );
+
+      case 3:
+        return (
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              Review Your Information
+            </Typography>
+            <Paper sx={{ p: 3, mb: 3 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                Health Conditions:
+              </Typography>
+              <Typography color="text.secondary" paragraph>
+                {formData.healthConditions.length > 0
+                  ? formData.healthConditions.map(id => 
+                      healthConditions.find(c => c.id === id)?.label
+                    ).join(', ')
+                  : 'None selected'}
+              </Typography>
+
+              <Typography variant="subtitle1" gutterBottom>
+                Allergies & Restrictions:
+              </Typography>
+              <Typography color="text.secondary" paragraph>
+                {formData.allergies.length > 0
+                  ? formData.allergies.map(id => 
+                      commonAllergies.find(a => a.id === id)?.label
+                    ).join(', ')
+                  : 'None selected'}
+              </Typography>
+
+              <Typography variant="subtitle1" gutterBottom>
+                Fitness Goals:
+              </Typography>
+              <Typography color="text.secondary">
+                {formData.fitnessGoals.length > 0
+                  ? formData.fitnessGoals.map(id => 
+                      fitnessGoals.find(g => g.id === id)?.label
+                    ).join(', ')
+                  : 'None selected'}
+              </Typography>
+            </Paper>
+
+            <TextField
+              fullWidth
+              multiline
+              rows={4}
+              label="Additional Notes"
+              value={formData.additionalNotes}
+              onChange={handleChange('additionalNotes')}
+              variant="outlined"
+            />
+          </Box>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  // If success, show success message
+  if (success) {
+    return (
+      <Container maxWidth="lg">
+        <Box sx={{ 
+          py: 8, 
+          textAlign: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 3 
+        }}>
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <CheckCircle 
+              sx={{ 
+                fontSize: 80, 
+                color: 'success.main',
+                mb: 2
+              }} 
+            />
+          </motion.div>
+          <Typography variant="h4" gutterBottom color="primary">
+            Plan Generated Successfully!
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Redirecting you to your personalized nutrition guide...
+          </Typography>
+          <CircularProgress sx={{ mt: 2 }} />
+        </Box>
+      </Container>
+    );
+  }
 
   return (
-    <Container maxWidth="md">
-      <Box sx={{ py: 6 }}>
+    <Container maxWidth="lg">
+      <Box sx={{ py: 8 }}>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <Typography variant="h1" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
+          <Typography variant="h2" align="center" gutterBottom color="primary">
             Health Assessment
           </Typography>
-          <Typography variant="h5" color="text.secondary" align="center" sx={{ mb: 6, maxWidth: 600, mx: 'auto' }}>
-            Tell us about your health conditions so we can provide personalized recommendations for your wellness journey.
+          <Typography variant="h5" align="center" color="text.secondary" paragraph sx={{ mb: 8 }}>
+            Let's create your personalized wellness plan
           </Typography>
-        </motion.div>
-        
-        <Card 
-          component={motion.div}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          sx={{ 
-            background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.95) 100%)',
-            backdropFilter: 'blur(10px)',
-          }}
-        >
-          <CardContent sx={{ p: 4 }}>
-            <Typography variant="h6" gutterBottom color="primary" sx={{ mb: 3 }}>
-              Select any health conditions that apply to you:
-            </Typography>
-            
-            <Grid container spacing={2}>
-              {healthConditions.map((condition) => (
-                <Grid item xs={12} sm={6} key={condition.id}>
-                  <Card 
-                    variant="outlined" 
-                    sx={{ 
-                      borderColor: selectedConditions.includes(condition.id) ? 'primary.main' : 'divider',
-                      backgroundColor: selectedConditions.includes(condition.id) ? 'primary.light' : 'transparent',
-                      transition: 'all 0.3s ease',
-                    }}
-                  >
-                    <CardContent>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            checked={selectedConditions.includes(condition.id)}
-                            onChange={() => handleConditionChange(condition.id)}
-                            color="primary"
-                          />
-                        }
-                        label={
-                          <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                            {condition.label}
-                          </Typography>
-                        }
-                      />
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
 
-            <Button
-              variant="contained"
-              fullWidth
-              sx={{ mt: 4 }}
-              onClick={() => setShowRecommendations(true)}
-              disabled={selectedConditions.length === 0}
-            >
-              Get Personalized Recommendations
-            </Button>
-          </CardContent>
-        </Card>
+          <Stepper activeStep={activeStep} sx={{ mb: 4 }}>
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
 
-        {showRecommendations && selectedConditions.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
+          )}
+
+          <Paper 
+            elevation={0}
+            sx={{ 
+              p: 4, 
+              borderRadius: 2,
+              background: 'rgba(255,255,255,0.9)',
+              backdropFilter: 'blur(10px)',
+            }}
           >
-            <Box sx={{ mt: 6 }}>
-              <Grid container spacing={4}>
-                <Grid item xs={12} md={6}>
-                  <Card sx={{ height: '100%' }}>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                        <IconButton
-                          sx={{
-                            backgroundColor: 'primary.light',
-                            mr: 2,
-                            '&:hover': { backgroundColor: 'primary.light' },
-                          }}
-                        >
-                          <FitnessCenter />
-                        </IconButton>
-                        <Typography variant="h6" color="primary">
-                          Exercise Recommendations
-                        </Typography>
-                      </Box>
-                      <Divider sx={{ mb: 3 }} />
-                      {getRecommendations().exercise.map((rec, index) => (
-                        <Alert 
-                          icon={<CheckCircle fontSize="inherit" />}
-                          severity="info" 
-                          sx={{ mt: 1 }} 
-                          key={index}
-                        >
-                          {rec}
-                        </Alert>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </Grid>
-                
-                <Grid item xs={12} md={6}>
-                  <Card sx={{ height: '100%' }}>
-                    <CardContent sx={{ p: 3 }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                        <IconButton
-                          sx={{
-                            backgroundColor: 'secondary.light',
-                            mr: 2,
-                            '&:hover': { backgroundColor: 'secondary.light' },
-                          }}
-                        >
-                          <Restaurant />
-                        </IconButton>
-                        <Typography variant="h6" color="primary">
-                          Nutrition Recommendations
-                        </Typography>
-                      </Box>
-                      <Divider sx={{ mb: 3 }} />
-                      {getRecommendations().nutrition.map((rec, index) => (
-                        <Alert 
-                          icon={<CheckCircle fontSize="inherit" />}
-                          severity="success" 
-                          sx={{ mt: 1 }} 
-                          key={index}
-                        >
-                          {rec}
-                        </Alert>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </Grid>
-              </Grid>
-            </Box>
+            {renderStepContent(activeStep)}
 
-            <MealPlanGuide selectedConditions={selectedConditions} />
-          </motion.div>
-        )}
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
+              {activeStep !== 0 && (
+                <Button onClick={handleBack} sx={{ mr: 1 }}>
+                  Back
+                </Button>
+              )}
+              <Button
+                variant="contained"
+                onClick={handleNext}
+                disabled={isLoading}
+                sx={{
+                  background: 'linear-gradient(45deg, #FF6B98 30%, #9C89B8 90%)',
+                  color: 'white',
+                  '&:hover': {
+                    background: 'linear-gradient(45deg, #FF6B98 40%, #9C89B8 100%)',
+                  },
+                }}
+              >
+                {isLoading ? 'Generating...' : activeStep === steps.length - 1 ? 'Generate Plan' : 'Next'}
+              </Button>
+            </Box>
+          </Paper>
+        </motion.div>
       </Box>
     </Container>
   );
