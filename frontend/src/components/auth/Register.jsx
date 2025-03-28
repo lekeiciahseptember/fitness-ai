@@ -13,7 +13,8 @@ function Register() {
     height: '',
     weight: '',
     fitness_level: 'beginner',
-    goals: []
+    goals: [],
+    age: ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -142,6 +143,26 @@ function Register() {
               value={formData.password}
               onChange={handleChange}
               required
+              style={{
+                width: '100%',
+                padding: '8px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+              }}
+            />
+          </div>
+
+          <div style={{ marginBottom: '20px' }}>
+            <label htmlFor="age" style={{ display: 'block', marginBottom: '5px' }}>
+              Age:
+            </label>
+            <input
+              id="age"
+              type="number"
+              name="age"
+              placeholder="Age"
+              value={formData.age}
+              onChange={handleChange}
               style={{
                 width: '100%',
                 padding: '8px',

@@ -35,6 +35,7 @@ import {
   DirectionsRun,
   MonitorWeight,
   Height,
+  Person,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 
@@ -51,6 +52,13 @@ const mockUserData = {
     streakDays: 7,
     caloriesBurned: 12500,
     achievements: 8,
+  },
+  profile: {
+    age: 28,
+    height: 175,
+    weight: 75,
+    gender: 'male',
+    activityLevel: 'moderate'
   },
   progress: {
     weight: {
@@ -109,6 +117,74 @@ const TabPanel = ({ children, value, index, ...other }) => (
     {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
   </div>
 );
+
+const PhysicalInfoCard = ({ userData }) => {
+  const { age, height, weight, gender, activityLevel } = userData.profile;
+  
+  return (
+    <Card sx={{ mb: 3 }}>
+      <CardContent>
+        <Typography variant="h6" gutterBottom>
+          Physical Information
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={6}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Person />
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Age
+                </Typography>
+                <Typography variant="body1">
+                  {age} years
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Height />
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Height
+                </Typography>
+                <Typography variant="body1">
+                  {height} cm
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <MonitorWeight />
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Weight
+                </Typography>
+                <Typography variant="body1">
+                  {weight} kg
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <FitnessCenter />
+              <Box>
+                <Typography variant="body2" color="text.secondary">
+                  Activity Level
+                </Typography>
+                <Typography variant="body1" sx={{ textTransform: 'capitalize' }}>
+                  {activityLevel}
+                </Typography>
+              </Box>
+            </Box>
+          </Grid>
+        </Grid>
+      </CardContent>
+    </Card>
+  );
+};
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState(0);
@@ -196,6 +272,9 @@ const Profile = () => {
 
       {/* Stats Cards */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12}>
+          <PhysicalInfoCard userData={userData} />
+        </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             icon={<FitnessCenter />}

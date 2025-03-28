@@ -20,6 +20,7 @@ async def register_user(user_data: Dict):
             "username": user_data["username"],
             "email": user_data["email"],
             "password_hash": hashed_password,
+            "age": int(user_data["age"]) if user_data.get("age") else None,
             "height": int(user_data["height"]) if user_data.get("height") else None,
             "weight": int(user_data["weight"]) if user_data.get("weight") else None,
             "fitness_level": user_data.get("fitness_level", "beginner"),
